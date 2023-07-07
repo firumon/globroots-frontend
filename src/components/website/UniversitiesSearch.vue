@@ -25,7 +25,7 @@ import {reactive, ref} from "vue";
 import {useQuasar} from "quasar";
 import SearchResultUniversity from "components/website/SearchResultUniversity.vue";
 import {UNIVERSITIES_FETCH_URL} from "assets/constants";
-import {filter, map, mapValues, shuffle, zipObject} from "lodash";
+import {concat, filter, map, mapValues, shuffle, zipObject} from "lodash";
 import SearchResultUniversityExtra from "components/website/SearchResultUniversityExtra.vue";
 
 const q = useQuasar();
@@ -53,8 +53,8 @@ function getAllUniversities(){
   if(data.value) return Promise.resolve(data.value)
   return new Promise(resolve => {
     fetch(UNIVERSITIES_FETCH_URL + '?universities=1').then(resp => resp.json()).then(json => {
-      let { misc,universities } = json, Associates = [''];
-      universities = universities.map(university => university.map(property => {
+      let { misc,universities,core } = json, Associates = [''], codeIdx = core[0].indexOf('Code'), urlIdx = core[0].indexOf('URL'), imgIdx = core[0].indexOf('Image');
+      universities = universities.map((rowAry,rowNum) => rowNum ? concat(rowAry,[codeIdx > -1 ? core[rowNum][codeIdx] : '',urlIdx > -1 ? core[rowNum][urlIdx] : '',imgIdx > -1 ? core[rowNum][imgIdx] : '']) : concat(rowAry,['Code','URL','Image'])).map(university => university.map(property => {
         let prop = String(property);
         if(prop.indexOf('⏩') > -1 || prop.indexOf('▶️') > -1){
           return prop.replace(/(⏩|▶️)([\w\s]+)\:/g,(m,bul,ass) => {

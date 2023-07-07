@@ -1,7 +1,7 @@
 <template>
   <q-card class="my-card">
-    <q-img height="12rem" src="https://cdn.quasar.dev/img/parallax2.jpg">
-      <div class="absolute-bottom text-h6">{{ details.Name }}</div>
+    <q-img height="12rem" :src="details.Image || 'https://cdn.quasar.dev/img/parallax2.jpg'">
+      <div class="absolute-bottom text-h6"><q-btn icon="open_in_new" dense flat target="_blank" :href="details.URL" :label="details.Name" no-caps /></div>
     </q-img>
     <q-card-section>
       <div class="row no-wrap absolute q-col-gutter-x-xs q-mr-xs" style="top: 0; right: 0; transform: translateY(-25%);">
@@ -12,7 +12,6 @@
           </div>
         </template>
       </div>
-      <div>{{ details.Campuses }}</div>
     </q-card-section>
     <q-list class="q-mt-md" separator>
       <template v-for="item in plot.list">
@@ -25,6 +24,13 @@
           <q-item-section side v-if="item[3] && data[item[3]]">{{ data[item[3]] }}</q-item-section>
         </q-item>
       </template>
+      <q-item>
+        <q-item-section side top><q-icon name="clear_all" /></q-item-section>
+        <q-item-section>
+          <q-item-label>Other Details</q-item-label>
+          <q-item-label caption v-for="text in others">{{ text }}</q-item-label>
+        </q-item-section>
+      </q-item>
       <q-item v-if="data['Process Flow']">
         <q-item-section side top><q-icon name="account_tree" /></q-item-section>
         <q-item-section>
@@ -39,17 +45,19 @@
 
 <script setup>
 import {computed, reactive} from "vue";
+import {filter, includes, map} from "lodash";
 
 const props = defineProps(['details','misc'])
 const emits = defineEmits(['requirements'])
 const data = computed(() => Object.assign({},props.details,props.misc))
+const others = computed(() => filter(map(props.misc,(detail,head) => (includes(plot.omit_others,head) || !detail) ? null : `${head}: ${detail}`)) )
 const plot = reactive({
   dot:{ 'Minimum English Requirement':'XII English','Minimum Academic Requirement':'Degree','Maximum Year GAP Accepted':'Max Gap' },
   list:[
     ['home','Campus','Campuses'],
     ['cast_for_education','Offer Turn Around Time','Offer Timeline','Max Offer TAT'],
     ['interpreter_mode','Interviews','Interviews'],
-    ['payments','Initial Deposit & Financial','Deposit','Finance'],
+    ['payments','Financial for CAS & Initial Deposit','Deposit','Finance'],
     ['social_distance','GAP Accepted','GAP','Maximum Year GAP Accepted'],
     ['account_balance','Fee Range','Fee Range'],
     ['credit_score','Scholarship','Scholarship'],
@@ -57,7 +65,8 @@ const plot = reactive({
     ['manage_history','CAS Turn Around Time',null,'CAS TAT'],
     ['school','Dual Masters',null,'Dual Masters'],
     ['diversity_1','Marriage Case',null,'Marriage Case'],
-  ]
+  ],
+  omit_others: ["Average Fee", "Campuses", "FD for CAS", "Fee Range", "Interviews", "Own Language Test", "Scholarship", "University"]
 })
 
 function viewRequirements(){
@@ -65,3 +74,6 @@ function viewRequirements(){
 }
 
 </script>
+<style>
+.uni_name { line-height: 0.85; }
+</style>
