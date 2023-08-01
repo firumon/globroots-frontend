@@ -1,6 +1,17 @@
 import { route } from 'quasar/wrappers'
 import { createRouter, createMemoryHistory, createWebHistory, createWebHashHistory } from 'vue-router'
-import routes from './routes'
+
+import routes_public from './public'
+import routes_luckydraw from './luckydraw'
+
+const hostRoutes = {
+  localhost: routes_luckydraw,
+  'luckydraw.globroots.com': routes_luckydraw,
+}
+// let rPath = hostRoutes[location.hostname] || './public';
+// const routes = (await import(rPath  /* @vite-ignore */ )).default
+// console.log(location.hostname)
+
 
 /*
  * If not building with SSR mode, you can
@@ -18,7 +29,7 @@ export default route(function (/* { store, ssrContext } */) {
 
   const Router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
-    routes,
+    routes: hostRoutes[location.hostname] || routes_public,
 
     // Leave this as is and make changes in quasar.conf.js instead!
     // quasar.conf.js -> build -> vueRouterMode

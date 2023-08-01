@@ -62,7 +62,6 @@ watch(() => misc.bImgIdx,function(cIdx){
 .background {
   background-image: url('background.jpg');
   background-size: cover;
-  //background-attachment: fixed;
   background-position: top;
   background-repeat: no-repeat;
 }
